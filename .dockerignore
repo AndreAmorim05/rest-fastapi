@@ -1,0 +1,9 @@
+# Ignore common development-related files and directories
+node_modules/
+.git/
+.gitignore
+.env
+temp/
+*.log
+*.DS_Store
+secrets/
