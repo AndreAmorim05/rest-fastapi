@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  unit_test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,4 +31,16 @@ jobs:
           poetry install --with dev
 
       - name: Run tests
+        # This 'env' block makes secrets and other environment variables
+        # available to the 'run' command in this step.
+        env:
+          # Pulling secrets from GitHub repository secrets.
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SIMPLE_API_TOKEN: ${{ secrets.SIMPLE_API_TOKEN }}
+          USER_LOGIN: ${{ secrets.USER_LOGIN }}
+
+          # Non-secret variables can be defined directly.
+          ENV_STATE: dev
+          ALGORITHM: HS256
+          ACCESS_TOKEN_EXPIRE_SECONDS: 1800
         run: poetry run pytest
