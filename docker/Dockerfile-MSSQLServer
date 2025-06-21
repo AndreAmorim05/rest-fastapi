@@ -1,0 +1,48 @@
+ARG PYTHON_VERSION=3.13
+
+FROM python:${PYTHON_VERSION}-slim AS builder
+
+WORKDIR /app
+
+COPY pyproject.toml poetry.lock* ./
+
+# Python
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Poetry
+ENV POETRY_HOME='/usr/local' \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VERSION=2.1.1 \
+    PATH="$PATH:$POETRY_HOME/bin"
+
+
+RUN apt-get update && apt-get install -y curl unixodbc libodbc2 && rm -rf /var/lib/apt/lists/*
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+COPY . /app
+
+RUN poetry install
+
+# --- Drivers install - msodbcsql18 ---
+RUN bash -c ' \
+    if ! [[ "9 10 11 12" == *"$(grep VERSION_ID /etc/os-release | cut -d "\"" -f 2 | cut -d "." -f 1)"* ]]; then \
+        echo "Debian $(grep VERSION_ID /etc/os-release | cut -d "\"" -f 2 | cut -d "." -f 1) is not currently supported."; \
+        exit 1; \
+    fi && \
+    curl -sSL -O https://packages.microsoft.com/config/debian/$(grep VERSION_ID /etc/os-release | cut -d "\"" -f 2 | cut -d "." -f 1)/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y msodbcsql18'
+# -------------------------------------------
+
+EXPOSE 8080
+
+ENTRYPOINT ["poetry", "run", "gunicorn", "rest_fastapi.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8080"]
