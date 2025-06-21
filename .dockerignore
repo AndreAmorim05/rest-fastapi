@@ -1,9 +1,33 @@
-# Ignore common development-related files and directories
-node_modules/
-.git/
+# Git
+.git
 .gitignore
-.env
-temp/
-*.log
-*.DS_Store
+
+# Docker
+.dockerignore
+docker/
+Dockerfile
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Poetry
+.poetry/
+
+# IDE
+.idea/
+.vscode/
+
+# Testes e Cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets
 secrets/
