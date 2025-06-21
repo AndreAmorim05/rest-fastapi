@@ -2,12 +2,9 @@
 Unit tests for security logic, such as token expiration.
 """
 import time
-from datetime import timedelta
 
 from fastapi.testclient import TestClient
-from freezegun import freeze_time
 
-from rest_fastapi.app import create_app
 from rest_fastapi.core.config import get_settings, Settings
 
 
