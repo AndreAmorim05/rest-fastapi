@@ -26,6 +26,7 @@ def get_test_settings() -> Settings:
         ALGORITHM="HS256",
         ACCESS_TOKEN_EXPIRE_SECONDS=15*60,
         SIMPLE_API_TOKEN="test-static-api-token",
+        USER_LOGIN={"testuser": {"password": "testpassword"}}
     )
 
 

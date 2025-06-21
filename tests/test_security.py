@@ -21,6 +21,7 @@ def test_token_expiration(client: TestClient):
             SECRET_KEY="test-secret",
             ACCESS_TOKEN_EXPIRE_SECONDS=1/60,  # 1 second
             SIMPLE_API_TOKEN="test-api-token",
+            USER_LOGIN={"testuser": {"password": "testpassword"}}
         )
 
     # Override the dependency just for this test's scope
